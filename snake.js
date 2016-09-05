@@ -12,13 +12,8 @@ var speed = 1/16/100;
 var x = 0;
 var y = 0;
 
-var snakeSize = 0;
-
 // Initialize Snake
 var snake = [];
-snake.push(new Circle(36, 12));
-snake.push(new Circle(24, 12));
-snake.push(new Circle(12, 12));
 
 var input = {
   up: false,
@@ -26,6 +21,31 @@ var input = {
   left: false,
   right: false
 }
+
+function init() {
+  snake.push(new Square(150, 30));
+  snake.push(new Square(140, 30));
+  snake.push(new Square(130, 30));
+  snake.push(new Square(120, 30));
+  snake.push(new Square(110, 30));
+  snake.push(new Square(100, 30));
+  snake.push(new Square(90, 30));
+  snake.push(new Square(80, 30));
+  snake.push(new Square(70, 30));
+  snake.push(new Square(60, 30));
+  snake.push(new Square(50, 30));
+  snake.push(new Square(40, 30));
+  snake.push(new Square(30, 30));
+
+  input.right = true;
+
+  update();
+  render();
+
+  // Flip the back buffer
+  frontCtx.drawImage(backBuffer, 0, 0);
+};
+init();
 
 /**
  * @function loop
@@ -36,17 +56,18 @@ function loop(newTime) {
   var elapsedTime = newTime - oldTime;
   oldTime = newTime;
 
-  // console.log(snakeArr.length);
-
   update(elapsedTime);
   render(elapsedTime);
 
   // Flip the back buffer
   frontCtx.drawImage(backBuffer, 0, 0);
 
+  setTimeout(loop, 120);
   // Run the next loop
-  window.requestAnimationFrame(loop);
+  // window.requestAnimationFrame(loop);
 }
+requestAnimationFrame(loop);
+loop();
 
 /**
  * @function update
@@ -65,17 +86,18 @@ function update(elapsedTime) {
   // Move head
   var moveX = snake[0].x;
   var moveY = snake[0].y;
+
   if (input.up) {
-    snake[0].y -= 1;
+    snake[0].y -= 10;
   }
-  if (input.down) {
-    snake[0].y += 1;
+  else if (input.down) {
+    snake[0].y += 10;
   }
-  if (input.left) {
-    snake[0].x -= 1;
+  else if (input.left) {
+    snake[0].x -= 10;
   }
-  if (input.right) {
-    snake[0].x += 1;
+  else if (input.right) {
+    snake[0].x += 10;
   }
 
   var tempY = 0;
@@ -107,26 +129,27 @@ function render(elapsedTime) {
   backCtx.fillStyle = "black";
   backCtx.fillRect(0, 0, backBuffer.width, backBuffer.height);
 
+  // backCtx.fillStyle = "green";
+  // backCtx.fillRect(30, 30, 50, 50);
+
   for (var i = 0; i < snake.length; i++) {
-    drawCircle(snake[i].x, snake[i].y);
+    drawSquare(snake[i].x, snake[i].y);
+    // drawCircle(snake[i].x, snake[i].y);
   }
+
 }
 
 /**
-  * @function Circle
-  * Draws a circle-shaped object and draws on canvas based on coordinates
-  *
+  * @function drawSqaure
   */
-function drawCircle(x, y) {
-  backCtx.beginPath();
-  backCtx.arc(x, y, 12, 0, 2 * Math.PI);
+function drawSquare(x, y) {
   backCtx.fillStyle = "green";
-  backCtx.fill();
-  backCtx.strokeStyle = 'green';
-  backCtx.stroke();
+  backCtx.fillRect(x, y, 10, 10);
+  backCtx.strokeStyle = "white";
+  backCtx.strokeRect(x, y, 10, 10);
 }
 
-function Circle(x, y) {
+function Square(x, y) {
   this.x = x;
   this.y = y;
 }
@@ -171,32 +194,5 @@ window.onkeydown = function(event) {
   return false;
 }
 
-// window.onkeyup = function(event) {
-//   event.preventDefault();
-//   console.log(event.keyCode);
-//   switch(event.keyCode) {
-//     // UP
-//     case 38:
-//     case 87:
-//       input.up = false;
-//       break;
-//     // LEFT
-//     case 37:
-//     case 65:
-//       input.left = false;
-//       break;
-//     // RIGHT
-//     case 39:
-//     case 68:
-//       input.right = false;
-//       break;
-//     // DOWN
-//     case 40:
-//     case 83:
-//       input.down = false;
-//       break;
-//   }
-// }
-
 /* Launch the game */
-window.requestAnimationFrame(loop);
+// window.requestAnimationFrame(loop);
