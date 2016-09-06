@@ -13,10 +13,11 @@ var moveY;
 // Track apple position
 var appleX;
 var appleY;
-// Initialize Snake
+// Initialize Snake and Apple
 var snake = [];
 var apple;
 
+// Track direction
 var input = {
   up: false,
   down: false,
@@ -30,17 +31,11 @@ var input = {
   */
 function init() {
   frontCtx.drawImage(backBuffer, 0, 0);
-  spawnSnake();
 
+  // Set the current direction to right, spawn snake and apple
   resetDirection();
-
-  // var appleX = Math.floor(Math.random() * (75 - 1 + 1) + 4) * 10;
-  // var appleY = Math.floor(Math.random() * (47 - 4 + 1) + 4) * 10;
-  generateAppleCoordinates();
+  spawnSnake();
   spawnApple();
-
-  // console.log("apple pos x: ", apple.x);
-  // console.log("apple pos y: ", apple.y);
 
   update();
   render();
@@ -84,8 +79,6 @@ function update(elapsedTime) {
 
   // TODO: Spawn an apple periodically
   // spawnApple(appleX, appleY);
-  console.log("apple pos x: ", apple.x);
-  console.log("apple pos y: ", apple.y);
 
   // TODO: Grow the snake periodically
   // growSnake();
@@ -162,14 +155,9 @@ function Square(x, y) {
   */
 function spawnApple() {
   apple = {
-    x: appleX,
-    y: appleY,
+    x: appleX = Math.floor(Math.random() * (75 - 1 + 1) + 4) * 10,
+    y: appleY = Math.floor(Math.random() * (47 - 4 + 1) + 4) * 10,
   };
-}
-
-function generateAppleCoordinates() {
-  appleX = Math.floor(Math.random() * (75 - 1 + 1) + 4) * 10;
-  appleY = Math.floor(Math.random() * (47 - 4 + 1) + 4) * 10;
 }
 
 /**
@@ -185,6 +173,10 @@ function drawApple(x, y) {
   backCtx.strokeRect(x, y, 10, 10);
 }
 
+/**
+  * @function move
+  * Increment movement based on direction
+  */
 function move() {
   if (input.up) {
     moveY -= 10;
@@ -200,6 +192,11 @@ function move() {
   }
 }
 
+/**
+  * @function checkOutOfBounds
+  * Determine if snake head passes the edge of the canvas
+  * If so, reset game
+  */
 function checkOutOfBounds() {
   if (snake[0].x < -1 || snake[0].y < -1 || snake[0].x > 761 || snake[0].y > 481) {
     snake = [];
@@ -208,6 +205,11 @@ function checkOutOfBounds() {
   }
 }
 
+/**
+  * @function appleEaten
+  * Determine if snake came into contact with apple
+  * If so, grow snake and generate new random apple
+  */
 function appleEaten() {
   if (snake[0].x == apple.x && snake[0].y == apple.y) {
     growSnake();
@@ -216,12 +218,19 @@ function appleEaten() {
   }
 }
 
+/**
+  * @function growSnake
+  * Add a new segment to the snake array
+  */
 function growSnake() {
-  //FIXME: This might double jump
   move();
   snake.unshift(new Square(moveX, moveY));
 }
 
+/**
+  * @function spawnSnake
+  * Utilized at beginning and restart of game, generates default snake
+  */
 function spawnSnake() {
   snake.push(new Square(120, 30));
   snake.push(new Square(110, 30));
@@ -233,6 +242,17 @@ function spawnSnake() {
   snake.push(new Square(50, 30));
   snake.push(new Square(40, 30));
   snake.push(new Square(30, 30));
+}
+
+/**
+  * @function resetDirection
+  * Resets direction of snake movement to the right
+  */
+function resetDirection() {
+  input.up = false;
+  input.down = false;
+  input.left = false;
+  input.right = true;
 }
 
 window.onkeydown = function(event) {
@@ -274,13 +294,3 @@ window.onkeydown = function(event) {
   }
   return false;
 }
-
-function resetDirection() {
-  input.up = false;
-  input.down = false;
-  input.left = false;
-  input.right = true;
-}
-
-/* Launch the game */
-// window.requestAnimationFrame(loop);
