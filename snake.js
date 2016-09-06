@@ -12,6 +12,9 @@ var speed = 1/16/100;
 var x = 0;
 var y = 0;
 
+var moveX;
+var moveY;
+
 // Initialize Snake
 var snake = [];
 var apple;
@@ -33,10 +36,10 @@ function init() {
 
   resetDirection();
 
-  var appleX = Math.ceil(Math.random() * (75 - 1 + 1) + 4) * 10;
-  var appleY = Math.ceil(Math.random() * (47 - 4 + 1) + 4) * 10;
+  // var appleX = Math.floor(Math.random() * (75 - 1 + 1) + 4) * 10;
+  // var appleY = Math.floor(Math.random() * (47 - 4 + 1) + 4) * 10;
+  spawnApple();
 
-  spawnApple(appleX, appleY);
   console.log("apple pos x: ", apple.x);
   console.log("apple pos y: ", apple.y);
 
@@ -81,7 +84,7 @@ loop();
 function update(elapsedTime) {
 
   // TODO: Spawn an apple periodically
-  drawApple(apple.x, apple.y);
+  // spawnApple(appleX, appleY);
 
   // TODO: Grow the snake periodically
   // growSnake();
@@ -89,21 +92,19 @@ function update(elapsedTime) {
   // TODO: Move the snake
   var moveX = snake[0].x;
   var moveY = snake[0].y;
-  console.log("Snake head pos X: ", moveX);
-  console.log("Snake head pos Y: ", moveY);
-
-  if (input.up) {
-    moveY -= 10;
-  }
-  if (input.down) {
-    moveY += 10;
-  }
-  if (input.left) {
-    moveX -= 10;
-  }
-  if (input.right) {
-    moveX += 10;
-  }
+  checkDirection();
+  // if (input.up) {
+  //   moveY -= 10;
+  // }
+  // if (input.down) {
+  //   moveY += 10;
+  // }
+  // if (input.left) {
+  //   moveX -= 10;
+  // }
+  // if (input.right) {
+  //   moveX += 10;
+  // }
 
   var end = snake.pop();
   end.x = moveX;
@@ -115,6 +116,8 @@ function update(elapsedTime) {
   checkOutOfBounds();
 
   // TODO: Determine if the snake has eaten an apple
+  appleEaten();
+
   // TODO: Determine if the snake has eaten its tail
   // TODO: [Extra Credit] Determine if the snake has run into an obstacle
 }
@@ -168,11 +171,17 @@ function Square(x, y) {
   * @param {appleX} X random coordinate of the apple
   * @param {appleY} Y random coordinate of the apple
   */
-function spawnApple(appleX, appleY) {
+function spawnApple() {
+  generateApple();
   apple = {
     x: appleX,
     y: appleY,
   };
+}
+
+function generateApple() {
+  var appleX = Math.floor(Math.random() * (75 - 1 + 1) + 4) * 10;
+  var appleY = Math.floor(Math.random() * (47 - 4 + 1) + 4) * 10;
 }
 
 /**
@@ -188,12 +197,39 @@ function drawApple(x, y) {
   backCtx.strokeRect(x, y, 10, 10);
 }
 
+function checkDirection() {
+  if (input.up) {
+    moveY -= 10;
+  }
+  if (input.down) {
+    moveY += 10;
+  }
+  if (input.left) {
+    moveX -= 10;
+  }
+  if (input.right) {
+    moveX += 10;
+  }
+}
+
 function checkOutOfBounds() {
   if (snake[0].x < -1 || snake[0].y < -1 || snake[0].x > 761 || snake[0].y > 481) {
     snake = [];
     resetDirection();
     init();
   }
+}
+
+function appleEaten() {
+  if (snake[0].x == apple.x && snake[0].y == apple.y) {
+    growSnake();
+    spawnApple();
+  }
+}
+
+function growSnake() {
+  checkDirection();
+  snake.unshift(new Square(moveX, moveY));
 }
 
 function spawnSnake() {
