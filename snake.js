@@ -87,7 +87,6 @@ function update(elapsedTime) {
   moveX = snake[0].x;
   moveY = snake[0].y;
   move();
-
   var end = snake.pop();
   end.x = moveX;
   end.y = moveY;
@@ -155,8 +154,8 @@ function Square(x, y) {
   */
 function spawnApple() {
   apple = {
-    x: appleX = Math.floor(Math.random() * (75 - 1 + 1) + 4) * 10,
-    y: appleY = Math.floor(Math.random() * (47 - 4 + 1) + 4) * 10,
+    x: appleX = Math.floor(Math.random() * (75 - 1 + 1) + 1) * 10,
+    y: appleY = Math.floor(Math.random() * (47 - 1 + 1) + 1) * 10,
   };
 }
 
@@ -213,7 +212,6 @@ function checkOutOfBounds() {
 function appleEaten() {
   if (snake[0].x == apple.x && snake[0].y == apple.y) {
     growSnake();
-    generateAppleCoordinates();
     spawnApple();
   }
 }
@@ -225,6 +223,23 @@ function appleEaten() {
 function growSnake() {
   move();
   snake.unshift(new Square(moveX, moveY));
+}
+
+/**
+  * @function
+  * Determine if snake ate its own tail
+  * If so reset game
+  */
+function snakeAteTail() {
+  var headPosX = snake[0].x;
+  var headPosY = snake[0].y;
+  for (var i = 0; i < snake.length; i++) {
+    if (headPosX == snake[i].x && headPosY == snake[i].y) {
+      snake = [];
+      init();
+      break;
+    }
+  }
 }
 
 /**
