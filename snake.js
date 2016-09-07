@@ -52,7 +52,6 @@ init();
  */
 function loop(newTime) {
   var elapsedTime = newTime - oldTime;
-  oldTime = newTime;
 
   update(elapsedTime);
   render(elapsedTime);
@@ -60,7 +59,7 @@ function loop(newTime) {
   // Flip the back buffer
   frontCtx.drawImage(backBuffer, 0, 0);
 
-  setTimeout(loop, 120);
+  setTimeout(loop, 120 );
   // Run the next loop
   // window.requestAnimationFrame(loop);
 }
@@ -100,6 +99,8 @@ function update(elapsedTime) {
   appleEaten();
 
   // TODO: Determine if the snake has eaten its tail
+  snakeAteTail();
+
   // TODO: [Extra Credit] Determine if the snake has run into an obstacle
 }
 
@@ -198,7 +199,10 @@ function move() {
   */
 function checkOutOfBounds() {
   if (snake[0].x < -1 || snake[0].y < -1 || snake[0].x > 761 || snake[0].y > 481) {
+
+    render();
     snake = [];
+
     resetDirection();
     init();
   }
@@ -233,8 +237,9 @@ function growSnake() {
 function snakeAteTail() {
   var headPosX = snake[0].x;
   var headPosY = snake[0].y;
-  for (var i = 0; i < snake.length; i++) {
+  for (var i = 1; i < snake.length; i++) {
     if (headPosX == snake[i].x && headPosY == snake[i].y) {
+      render();
       snake = [];
       init();
       break;
@@ -247,6 +252,12 @@ function snakeAteTail() {
   * Utilized at beginning and restart of game, generates default snake
   */
 function spawnSnake() {
+  snake.push(new Square(180, 30));
+  snake.push(new Square(170, 30));
+  snake.push(new Square(160, 30));
+  snake.push(new Square(150, 30));
+  snake.push(new Square(140, 30));
+  snake.push(new Square(130, 30));
   snake.push(new Square(120, 30));
   snake.push(new Square(110, 30));
   snake.push(new Square(100, 30));
@@ -277,6 +288,9 @@ window.onkeydown = function(event) {
     // UP
     case 38:
     case 87:
+      if (input.down) {
+        break;
+      }
       input.up = true;
       input.down = false;
       input.left = false;
@@ -285,6 +299,9 @@ window.onkeydown = function(event) {
     // LEFT
     case 37:
     case 65:
+      if (input.right) {
+        break;
+      }
       input.left = true;
       input.right = false;
       input.up = false;
@@ -293,6 +310,9 @@ window.onkeydown = function(event) {
     // RIGHT
     case 39:
     case 68:
+      if (input.left) {
+        break;
+      }
       input.right = true;
       input.up = false;
       input.down = false;
@@ -301,6 +321,9 @@ window.onkeydown = function(event) {
     // DOWN
     case 40:
     case 83:
+      if (input.up) {
+        break;
+      }
       input.down = true;
       input.left = false;
       input.right = false;
