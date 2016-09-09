@@ -52,6 +52,7 @@ init();
  */
 function loop(newTime) {
   var elapsedTime = newTime - oldTime;
+  oldTime = newTime;
 
   update(elapsedTime);
   render(elapsedTime);
@@ -59,7 +60,7 @@ function loop(newTime) {
   // Flip the back buffer
   frontCtx.drawImage(backBuffer, 0, 0);
 
-  setTimeout(loop, 120 );
+  setTimeout(loop, 120);
   // Run the next loop
   // window.requestAnimationFrame(loop);
 }
@@ -76,13 +77,14 @@ loop();
  */
 function update(elapsedTime) {
 
-  // TODO: Spawn an apple periodically
-  // spawnApple(appleX, appleY);
+  // Check if snake ate it's own tail
+  snakeAteTail();
 
-  // TODO: Grow the snake periodically
-  // growSnake();
+  // Check if snake head went out of bounds
+  checkOutOfBounds();
 
-  // TODO: Move the snake
+  // Move the snake, pop the end of the snake array and add to front after
+  // updating the head's coordinates based on direction
   moveX = snake[0].x;
   moveY = snake[0].y;
   move();
@@ -91,17 +93,8 @@ function update(elapsedTime) {
   end.y = moveY;
   snake.unshift(end);
 
-  // TODO: Determine if the snake has moved out-of-bounds (offscreen)
-  // FIXME: Border of screen is off
-  checkOutOfBounds();
-
-  // TODO: Determine if the snake has eaten an apple
+  // Check if snake ate the apple
   appleEaten();
-
-  // TODO: Determine if the snake has eaten its tail
-  snakeAteTail();
-
-  // TODO: [Extra Credit] Determine if the snake has run into an obstacle
 }
 
 /**
@@ -198,12 +191,8 @@ function move() {
   * If so, reset game
   */
 function checkOutOfBounds() {
-  if (snake[0].x < -1 || snake[0].y < -1 || snake[0].x > 761 || snake[0].y > 481) {
-
-    render();
+  if (snake[0].x < -9 || snake[0].y < -9 || snake[0].x >= 760 || snake[0].y >= 480) {
     snake = [];
-
-    resetDirection();
     init();
   }
 }
@@ -239,7 +228,6 @@ function snakeAteTail() {
   var headPosY = snake[0].y;
   for (var i = 1; i < snake.length; i++) {
     if (headPosX == snake[i].x && headPosY == snake[i].y) {
-      render();
       snake = [];
       init();
       break;
