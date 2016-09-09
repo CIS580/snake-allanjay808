@@ -16,6 +16,10 @@ var appleY;
 // Initialize Snake and Apple
 var snake = [];
 var apple;
+// Track current score
+var score;
+// Determines if game is over
+var gameover;
 
 // Track direction
 var input = {
@@ -32,7 +36,10 @@ var input = {
 function init() {
   frontCtx.drawImage(backBuffer, 0, 0);
 
-  // Set the current direction to right, spawn snake and apple
+  // When game restarts make sure gameover is false
+  gameover = false;
+  // Set the current direction to right, spawn snake and apple, score to 0
+  score = 0;
   resetDirection();
   spawnSnake();
   spawnApple();
@@ -54,15 +61,16 @@ function loop(newTime) {
   var elapsedTime = newTime - oldTime;
   oldTime = newTime;
 
-  update(elapsedTime);
+  // Update the game if we haven't lost
+  if (gameover == false) {
+    update(elapsedTime);
+  }
   render(elapsedTime);
 
   // Flip the back buffer
   frontCtx.drawImage(backBuffer, 0, 0);
 
   setTimeout(loop, 120);
-  // Run the next loop
-  // window.requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
 loop();
@@ -82,6 +90,11 @@ function update(elapsedTime) {
 
   // Check if snake head went out of bounds
   checkOutOfBounds();
+
+  // This restricts moving the snake if game is lost
+  if (gameover) {
+    return;
+  }
 
   // Move the snake, pop the end of the snake array and add to front after
   // updating the head's coordinates based on direction
@@ -109,11 +122,16 @@ function render(elapsedTime) {
   backCtx.fillStyle = "black";
   backCtx.fillRect(0, 0, backBuffer.width, backBuffer.height);
 
+  if (gameover) {
+    displayLostGameMessage();
+  }
+
   for (var i = 0; i < snake.length; i++) {
     drawSquare(snake[i].x, snake[i].y);
   }
 
   drawApple(apple.x, apple.y);
+  trackScore();
 }
 
 /**
@@ -192,8 +210,7 @@ function move() {
   */
 function checkOutOfBounds() {
   if (snake[0].x < -9 || snake[0].y < -9 || snake[0].x >= 760 || snake[0].y >= 480) {
-    snake = [];
-    init();
+    gameover = true;
   }
 }
 
@@ -204,6 +221,7 @@ function checkOutOfBounds() {
   */
 function appleEaten() {
   if (snake[0].x == apple.x && snake[0].y == apple.y) {
+    score += 10;
     growSnake();
     spawnApple();
   }
@@ -228,11 +246,38 @@ function snakeAteTail() {
   var headPosY = snake[0].y;
   for (var i = 1; i < snake.length; i++) {
     if (headPosX == snake[i].x && headPosY == snake[i].y) {
-      snake = [];
-      init();
+      gameover = true;
       break;
     }
   }
+}
+
+/**
+  * @function trackScore
+  * Track current score
+  */
+function trackScore() {
+  backCtx.font = "bold 16px Arial";
+  backCtx.fillStyle = "white";
+  var scoreText = "Score: " + score;
+  backCtx.fillText(scoreText, 10, 20);
+}
+
+/**
+  * @function displayLostGameMessage
+  * Displays Game Over message
+  */
+function displayLostGameMessage() {
+  backCtx.font = "bold 16px Arial";
+  backCtx.fillStyle = "white";
+  var message = "Game Over! Click anywhere to Restart";
+  backCtx.fillText(message, 240, 240);
+
+  var canvas = document.getElementById('snake');
+  canvas.addEventListener('click', function() {
+    snake = [];
+    init();
+  });
 }
 
 /**
